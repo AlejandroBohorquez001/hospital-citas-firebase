@@ -1,0 +1,49 @@
+{
+  "indexes": [
+    {
+      "collectionGroup": "disponibilidades",
+      "queryScope": "COLLECTION",
+      "fields": [
+        { "fieldPath": "estado", "order": "ASCENDING" },
+        { "fieldPath": "medico.especialidad", "order": "ASCENDING" },
+        { "fieldPath": "horario.fecha", "order": "ASCENDING" }
+      ]
+    },
+    {
+      "collectionGroup": "disponibilidades",
+      "queryScope": "COLLECTION",
+      "fields": [
+        { "fieldPath": "estado", "order": "ASCENDING" },
+        { "fieldPath": "id_medico", "order": "ASCENDING" },
+        { "fieldPath": "horario.fecha", "order": "ASCENDING" }
+      ]
+    },
+    {
+      "collectionGroup": "citas",
+      "queryScope": "COLLECTION",
+      "fields": [
+        { "fieldPath": "estado", "order": "ASCENDING" },
+        { "fieldPath": "id_medico", "order": "ASCENDING" }
+      ]
+    },
+    {
+      "collectionGroup": "citas",
+      "queryScope": "COLLECTION",
+      "fields": [
+        { "fieldPath": "estado", "order": "ASCENDING" },
+        { "fieldPath": "horario.fecha", "order": "DESCENDING" }
+      ]
+    },
+    {
+      "collectionGroup": "citas",
+      "queryScope": "COLLECTION",
+      "fields": [
+        { "fieldPath": "id_medico", "order": "ASCENDING" },
+        { "fieldPath": "id_sala", "order": "ASCENDING" },
+        { "fieldPath": "id_horario", "order": "ASCENDING" },
+        { "fieldPath": "estado", "order": "ASCENDING" }
+      ]
+    }
+  ],
+  "fieldOverrides": []
+}

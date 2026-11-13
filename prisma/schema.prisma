@@ -1,0 +1,101 @@
+// Prisma Schema para Hospital Citas (Versión Relacional)
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model Medico {
+  id                String           @id @default(cuid())
+  nombres_completos String
+  telefono          String
+  direccion         String
+  especialidad      String
+  created_at        DateTime         @default(now())
+
+  disponibilidades  Disponibilidad[]
+  citas             Cita[]
+
+  @@map("medico")
+}
+
+model Paciente {
+  id                String   @id @default(cuid())
+  nombres_completos String
+  telefono          String
+  direccion         String
+  genero            String   // "M", "F", "Otro"
+  created_at        DateTime @default(now())
+
+  citas             Cita[]
+
+  @@map("paciente")
+}
+
+model Horario {
+  id           String   @id @default(cuid())
+  lugar        String
+  fecha        String   // Formato YYYY-MM-DD
+  hora_inicial String   // Formato HH:mm (ej: 10:00)
+  hora_final   String   // Formato HH:mm (ej: 10:30)
+  created_at   DateTime @default(now())
+
+  disponibilidades Disponibilidad[]
+  citas            Cita[]
+
+  @@index([fecha])
+  @@map("horario")
+}
+
+model Disponibilidad {
+  id_medico  String
+  id_sala    String
+  id_horario String
+  estado     Int      @default(0) // 0 = libre, 1 = ocupada
+  created_at DateTime @default(now())
+
+  medico     Medico   @relation(fields: [id_medico], references: [id], onDelete: Cascade)
+  horario    Horario  @relation(fields: [id_horario], references: [id], onDelete: Cascade)
+  citas      Cita[]
+
+  // Clave primaria compuesta
+  @@id([id_medico, id_sala, id_horario])
+
+  // Restricciones de integridad solicitadas:
+  // - Un médico no puede tener dos disponibilidades en el mismo horario
+  @@unique([id_medico, id_horario], name: "uq_medico_horario")
+  // - Una sala no puede estar en dos disponibilidades en el mismo horario
+  @@unique([id_sala, id_horario], name: "uq_sala_horario")
+
+  // Índices solicitados sobre FK e (id_horario, estado)
+  @@index([id_medico])
+  @@index([id_horario])
+  @@index([id_horario, estado])
+  @@map("disponibilidad")
+}
+
+model Cita {
+  id             String         @id @default(cuid())
+  id_paciente    String
+  id_medico      String
+  id_sala        String
+  id_horario     String
+  estado         String         @default("programada") // programada, cancelada, atendida
+  motivo         String
+  fecha_creacion DateTime       @default(now())
+
+  paciente       Paciente       @relation(fields: [id_paciente], references: [id], onDelete: Restrict)
+  medico         Medico         @relation(fields: [id_medico], references: [id], onDelete: Restrict)
+  horario        Horario        @relation(fields: [id_horario], references: [id], onDelete: Restrict)
+  disponibilidad Disponibilidad @relation(fields: [id_medico, id_sala, id_horario], references: [id_medico, id_sala, id_horario], onDelete: Restrict)
+
+  @@index([id_paciente])
+  @@index([id_medico])
+  @@index([id_horario])
+  @@index([estado])
+  @@map("cita")
+}
